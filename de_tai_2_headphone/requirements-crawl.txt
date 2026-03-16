@@ -1,0 +1,3 @@
+# Cho crawl Cellphones (nut "Xem thêm") - chay: pip install -r requirements-crawl.txt
+selenium>=4.0.0
+webdriver-manager>=4.0.0

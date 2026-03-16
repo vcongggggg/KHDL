@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 """
 Crawl tai nghe/headphone tu CellphoneS (cellphones.com.vn).
-Trang danh sach co HTML server-side, dung requests + BeautifulSoup la du.
+- Danh muc: requests + BeautifulSoup.
+- Trang tim kiem: dung Selenium click nut "Xem thêm" de load het san pham (site khong phan trang URL).
 """
 
 import os
@@ -10,15 +11,52 @@ import time
 import csv
 import requests
 from bs4 import BeautifulSoup
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlparse, parse_qs, urlencode, urlunparse, quote
+
+# Selenium (bat buoc cho phan search "Xem thêm"). Cai: pip install selenium webdriver-manager
+SELENIUM_AVAILABLE = False
+try:
+    from selenium import webdriver
+    from selenium.webdriver.common.by import By
+    from selenium.webdriver.chrome.options import Options
+    from selenium.webdriver.support.ui import WebDriverWait
+    from selenium.webdriver.support import expected_conditions as EC
+    from webdriver_manager.chrome import ChromeDriverManager
+    from selenium.webdriver.chrome.service import Service
+    SELENIUM_AVAILABLE = True
+except ImportError:
+    pass
 
 BASE_URL = "https://cellphones.com.vn"
-# Cac trang danh sach tai nghe (co the them trang khac)
+# Cac trang danh sach tai nghe (danh muc)
 LISTING_URLS = [
+    # Trang tong hop tai nghe
+    "https://cellphones.com.vn/thiet-bi-am-thanh/tai-nghe.html",
+    # Mot so danh muc con va khu vuc lien quan
     "https://cellphones.com.vn/thiet-bi-am-thanh/tai-nghe/headphones.html",
     "https://cellphones.com.vn/thiet-bi-am-thanh/tai-nghe/co-day.html",
+    "https://cellphones.com.vn/thiet-bi-am-thanh/tai-nghe/kiem-am.html",
+    "https://cellphones.com.vn/thiet-bi-am-thanh/tai-nghe/the-thao.html",
     "https://cellphones.com.vn/phu-kien/headphones.html",
+    "https://cellphones.com.vn/phu-kien/xa-hang/tai-nghe.html",
+    "https://cellphones.com.vn/san-pham-moi/tai-nghe.html",
 ]
+# Tim kiem theo tu khoa (trang search co the co nhieu san pham, thu phan trang &p=)
+# Co y dung nhieu tu khoa gan nhau de tang kha nang bao phu
+SEARCH_QUERIES = [
+    "tai nghe chup tai",
+    "tai nghe bluetooth",
+    "tai nghe gaming",
+    "tai nghe",
+    "tai nghe true wireless",
+    "tai nghe in ear",
+    "tai nghe co day",
+    "headphone",
+    "earbuds",
+]
+MAX_PAGES_PER_LISTING = int(os.environ.get("CELLPHONES_MAX_PAGES", "25"))
+# So lan nhan "Xem thêm" toi da (cu click cho den khi het nut hoac dat gioi han nay)
+MAX_LOAD_MORE_CLICKS = int(os.environ.get("CELLPHONES_LOAD_MORE_CLICKS", "600"))
 
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
@@ -270,23 +308,117 @@ def parse_detail_page(html: str, base_row: dict) -> dict:
     return base_row
 
 
+def _url_for_page(base: str, page: int) -> str:
+    """Tra ve URL trang danh sach (page=1, 2, ...)."""
+    if page == 1:
+        return base
+    parsed = urlparse(base)
+    qs = parse_qs(parsed.query)
+    qs["page"] = [str(page)]
+    new_query = urlencode(qs, doseq=True)
+    return urlunparse(parsed._replace(query=new_query))
+
+
+def _search_url(query: str) -> str:
+    """URL trang tim kiem (1 trang, load them bang nut Xem thêm)."""
+    return f"{BASE_URL}/catalogsearch/result?q={quote(query)}"
+
+
+def _crawl_search_with_load_more(query: str) -> str:
+    """
+    Mo trang tim kiem bang Selenium, nhan nut "Xem thêm" nhieu lan de load het san pham,
+    tra ve HTML cuoi cung de parse.
+    """
+    if not SELENIUM_AVAILABLE:
+        print("  (Can selenium + webdriver-manager. Dung requests lay 1 trang.)")
+        return fetch_html(_search_url(query))
+
+    url = _search_url(query)
+    print("  Mo Chrome, load trang tim kiem...")
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")
+    chrome_options.add_argument("--no-sandbox")
+    chrome_options.add_argument("--disable-dev-shm-usage")
+    chrome_options.add_argument("--window-size=1920,1080")
+    driver = None
+    try:
+        service = Service(ChromeDriverManager().install())
+        driver = webdriver.Chrome(service=service, options=chrome_options)
+        driver.get(url)
+        wait = WebDriverWait(driver, 15)
+        click_count = 0
+        # Click den khi khong con nut "Xem thêm" hoac dat gioi han MAX_LOAD_MORE_CLICKS
+        for _ in range(MAX_LOAD_MORE_CLICKS):
+            try:
+                btn = wait.until(EC.element_to_be_clickable((
+                    By.XPATH,
+                    "//*[contains(text(), 'Xem thêm') or contains(text(), 'xem thêm')]"
+                )))
+            except Exception:
+                break
+            try:
+                driver.execute_script("arguments[0].scrollIntoView({block:'center'});", btn)
+                time.sleep(0.5)
+                driver.execute_script("arguments[0].click();", btn)
+                click_count += 1
+                if click_count % 20 == 0:
+                    print("    Nhan Xem thêm:", click_count, "lan")
+                time.sleep(1.2)
+            except Exception:
+                break
+        print("  Tong nhan Xem thêm:", click_count, "lan. Lay HTML...")
+        return driver.page_source
+    finally:
+        if driver:
+            driver.quit()
+
+
 def crawl_all(fetch_detail_for_price: bool = True) -> list:
     all_rows = []
     seen_urls = set()
 
-    for url in LISTING_URLS:
-        print("Crawling listing:", url)
+    for base in LISTING_URLS:
+        # Thu page 1, 2, ... dung lai khi trang khong them san pham moi (tranh request trung noi dung)
+        for page in range(1, MAX_PAGES_PER_LISTING + 1):
+            url = _url_for_page(base, page)
+            print("Crawling:", url)
+            try:
+                html = fetch_html(url)
+            except Exception as e:
+                print("  -> Loi:", e)
+                break
+            rows = parse_listing(html, url)
+            new_count = 0
+            for r in rows:
+                if r["url"] not in seen_urls:
+                    seen_urls.add(r["url"])
+                    all_rows.append(r)
+                    new_count += 1
+            print("  -> Trang nay:", len(rows), "san pham, moi:", new_count, "| Tong:", len(all_rows))
+            time.sleep(DELAY)
+            # Dung phan trang khi khong con san pham moi (site co the khong dung ?page= hoac chi 1 trang)
+            if new_count == 0:
+                print("  -> Khong them mau moi, chuyen danh muc khac.")
+                break
+
+    # Crawl trang TIM KIEM: mo bang Selenium, nhan "Xem thêm" nhieu lan de load het, roi parse
+    print("\n--- Crawl trang tim kiem (nut Xem thêm) ---")
+    for query in SEARCH_QUERIES:
+        url = _search_url(query)
+        print("Search:", url)
         try:
-            html = fetch_html(url)
+            html = _crawl_search_with_load_more(query)
         except Exception as e:
             print("  -> Loi:", e)
             continue
         rows = parse_listing(html, url)
+        new_count = 0
         for r in rows:
             if r["url"] not in seen_urls:
                 seen_urls.add(r["url"])
                 all_rows.append(r)
-        print("  -> Lay duoc", len(rows), "san pham, tong:", len(all_rows))
+                new_count += 1
+        print("  -> Lay duoc:", len(rows), "san pham, moi:", new_count, "| Tong:", len(all_rows))
         time.sleep(DELAY)
 
     # Vao tung trang chi tiet de lay gia (neu tren listing khong co)
@@ -347,6 +479,7 @@ def main():
     raw_dir = os.path.join(os.path.dirname(script_dir), "raw_data")
     rows = crawl_all()
     save_csv(rows, raw_dir)
+    return rows
 
 
 if __name__ == "__main__":
