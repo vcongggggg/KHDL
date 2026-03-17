@@ -1,0 +1,9 @@
+selenium==4.41.0
+webdriver_manager==4.0.2
+ipykernel
+tqdm==4.67.3
+pandas==3.0.1
+numpy==2.4.3
+scikit-learn==1.8.0
+seaborn==0.13.2
+matplotlib==3.10.8
