@@ -1,0 +1,14 @@
+﻿column,dtype,non_null_count,missing_count,missing_%
+type,object,476,714,60.0
+battery_life_hours,float64,723,467,39.24
+weight_gram,float64,755,435,36.55
+connection,object,959,231,19.41
+price_raw,object,1178,12,1.01
+brand,object,1187,3,0.25
+has_mic,float64,1187,3,0.25
+is_gaming,float64,1187,3,0.25
+is_wireless,float64,1187,3,0.25
+name,object,1190,0,0.0
+price_vnd,int64,1190,0,0.0
+source,object,1190,0,0.0
+url,object,1190,0,0.0

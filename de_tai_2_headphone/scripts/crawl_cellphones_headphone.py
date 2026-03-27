@@ -18,6 +18,7 @@ SELENIUM_AVAILABLE = False
 try:
     from selenium import webdriver
     from selenium.webdriver.common.by import By
+    from selenium.webdriver.common.keys import Keys
     from selenium.webdriver.chrome.options import Options
     from selenium.webdriver.support.ui import WebDriverWait
     from selenium.webdriver.support import expected_conditions as EC
@@ -66,6 +67,205 @@ HEADERS = {
 
 DELAY = 1.0  # giay giua cac request
 DELAY_DETAIL = 0.8  # giay giua moi trang chi tiet (tranh bi chan)
+DETAIL_SELENIUM = os.environ.get("CELLPHONES_DETAIL_SELENIUM", "1").strip() != "0"
+
+
+def _open_detail_driver():
+    if not SELENIUM_AVAILABLE:
+        return None
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")
+    chrome_options.add_argument("--no-sandbox")
+    chrome_options.add_argument("--disable-dev-shm-usage")
+    chrome_options.add_argument("--window-size=1920,1080")
+    service = Service(ChromeDriverManager().install())
+    return webdriver.Chrome(service=service, options=chrome_options)
+
+
+def _try_open_technical_modal(driver, wait: WebDriverWait) -> bool:
+    """
+    Cellphones: nhiều spec (đặc biệt 'Cổng kết nối') nằm trong modal 'Thông số kĩ thuật'
+    và chỉ hiện khi bấm nút 'Xem tất cả' (button.button__show-modal-technical).
+    """
+    # Scroll xuống vùng thông số
+    try:
+        driver.execute_script("window.scrollTo(0, document.body.scrollHeight * 0.55);")
+        time.sleep(0.5)
+    except Exception:
+        pass
+
+    # Một số trang render nút dưới dạng <button> hoặc <a>
+    candidates = [
+        (By.CSS_SELECTOR, "button.button__show-modal-technical"),
+        (By.CSS_SELECTOR, "a.button__show-modal-technical"),
+        (By.XPATH, "//*[@class and contains(@class,'button__show-modal-technical')]"),
+        (By.XPATH, "//button[contains(.,'Xem tất cả') or contains(.,'Xem tat ca') or contains(.,'Xem Tất Cả')]"),
+        (By.XPATH, "//a[contains(.,'Xem tất cả') or contains(.,'Xem tat ca') or contains(.,'Xem Tất Cả')]"),
+    ]
+
+    btn = None
+    for how, sel in candidates:
+        try:
+            # không ép "clickable" quá chặt (nhiều khi bị overlay), chỉ cần "present"
+            btn = wait.until(EC.presence_of_element_located((how, sel)))
+            break
+        except Exception:
+            continue
+    if not btn:
+        return False
+
+    # Click best-effort bằng JS (ổn định hơn)
+    try:
+        driver.execute_script("arguments[0].scrollIntoView({block:'center'});", btn)
+        time.sleep(0.25)
+        driver.execute_script("arguments[0].click();", btn)
+    except Exception:
+        try:
+            btn.click()
+        except Exception:
+            return False
+
+    # Chờ modal render (class teleport-modal_main xuất hiện)
+    try:
+        wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, ".teleport-modal_main")))
+        return True
+    except Exception:
+        return False
+
+
+def _close_technical_modal(driver) -> None:
+    for how, sel in [
+        (By.CSS_SELECTOR, ".teleport-modal_header .close-btn"),
+        (By.CSS_SELECTOR, ".teleport-modal_main .close-btn"),
+        (By.XPATH, "//span[contains(@class,'close-btn')]"),
+    ]:
+        try:
+            el = driver.find_element(how, sel)
+            driver.execute_script("arguments[0].click();", el)
+            time.sleep(0.2)
+            return
+        except Exception:
+            pass
+    try:
+        driver.switch_to.active_element.send_keys(Keys.ESCAPE)
+        time.sleep(0.2)
+    except Exception:
+        pass
+
+
+def _parse_technical_modal_specs(html: str) -> dict:
+    """
+    Parse HTML (page_source sau khi mo modal) để lấy spec từ bảng:
+      div.teleport-modal_main ... section.technical-content-section
+      p.title ... table.technical-content tr.technical-content-item td/td
+    """
+    soup = BeautifulSoup(html, "lxml")
+    modals = soup.select(".teleport-modal_main")
+    if not modals:
+        return {}
+    # Có trang render nhiều modal; chọn modal có nhiều dòng thông số nhất
+    modal = max(modals, key=lambda m: len(m.select("tr.technical-content-item")) + len(m.select("table tr")))
+
+    specs = {
+        "brand": "",
+        "connection": "",
+        "battery_life_hours": None,
+        "weight_gram": None,
+        "has_mic": 0,
+        "is_wireless": 0,
+    }
+
+    def pick_hours(text: str):
+        nums = re.findall(r"\d+", text or "")
+        if not nums:
+            return None
+        try:
+            return int(max(nums, key=int))
+        except ValueError:
+            return None
+
+    for section in modal.select("section.technical-content-section"):
+        sec_title = (section.select_one("p.title") or section.select_one(".title"))
+        sec_name = (sec_title.get_text(" ", strip=True) if sec_title else "").strip()
+        for tr in section.select("tr.technical-content-item"):
+            tds = tr.find_all(["td", "th"])
+            if len(tds) < 2:
+                continue
+            label = (tds[0].get_text(" ", strip=True) or "").strip()
+            value = (tds[1].get_text(" ", strip=True) or "").strip()
+            ll = label.lower()
+            vv = value.lower()
+
+            # Brand
+            if ll.startswith("hãng") or "hãng sản xuất" in ll or ll.startswith("thương hiệu"):
+                if value:
+                    specs["brand"] = value
+
+            # Connection: chỉ lấy từ các label kết nối rõ ràng (tránh bắt nhầm các dòng khác trong section)
+            if any(k in ll for k in ["cổng kết nối", "kết nối", "chuẩn kết nối", "công nghệ kết nối", "connector"]):
+                # bỏ các mục không phải connector thực (vd "Ứng dụng kết nối: Soundcore")
+                if "ứng dụng" in ll or "ung dung" in ll:
+                    continue
+                # loại "phạm vi kết nối 10m" (không phải connector)
+                if "phạm vi" in ll or "pham vi" in ll:
+                    pass
+                else:
+                    specs["connection"] = value
+                    if any(x in vv for x in ["bluetooth", "wireless", "không dây", "true wireless", "tws", "2.4ghz"]):
+                        specs["is_wireless"] = 1
+
+            # Battery usage / charging time (chỉ lấy usage, ưu tiên các label có 'thời lượng'/'pin'/'sử dụng')
+            if any(k in ll for k in ["thời lượng", "thoi luong", "thời gian sử dụng", "pin"]):
+                h = pick_hours(value)
+                if h is not None:
+                    # tránh nhầm "thời gian sạc 2-3 giờ" nếu có đồng thời "thời lượng sử dụng pin"
+                    if ("sạc" in ll) and ("sử dụng" not in ll) and ("pin" not in ll):
+                        pass
+                    else:
+                        specs["battery_life_hours"] = max(specs["battery_life_hours"] or 0, h) or h
+
+            # Weight
+            if "trọng lượng" in ll or "khối lượng" in ll or "weight" in ll:
+                m = re.search(r"([\d.,]+)\s*g", value.replace(",", "."), flags=re.I)
+                if m:
+                    try:
+                        specs["weight_gram"] = float(m.group(1))
+                    except ValueError:
+                        pass
+
+            # Mic
+            if ll.startswith("micro"):
+                if any(x in vv for x in ["có", "có", "yes", "true"]):
+                    specs["has_mic"] = 1
+
+    if specs.get("connection"):
+        vv = specs["connection"].lower()
+        if any(x in vv for x in ["bluetooth", "wireless", "không dây", "true wireless", "tws", "2.4ghz"]):
+            specs["is_wireless"] = 1
+
+    return specs
+
+
+def fetch_cellphones_specs_via_modal(url: str, driver=None) -> dict:
+    """
+    Dùng Selenium mở trang detail, bấm 'Xem tất cả' để mở modal thông số,
+    rồi parse các trường quan trọng (đặc biệt connection).
+    """
+    if not SELENIUM_AVAILABLE or driver is None:
+        return {}
+    try:
+        driver.get(url)
+        wait = WebDriverWait(driver, 15)
+        wait.until(lambda d: d.execute_script("return document.readyState") == "complete")
+        ok = _try_open_technical_modal(driver, wait)
+        if not ok:
+            return {}
+        html = driver.page_source
+        specs = _parse_technical_modal_specs(html)
+        _close_technical_modal(driver)
+        return specs
+    except Exception:
+        return {}
 
 
 def fetch_html(url: str) -> str:
@@ -421,24 +621,52 @@ def crawl_all(fetch_detail_for_price: bool = True) -> list:
         print("  -> Lay duoc:", len(rows), "san pham, moi:", new_count, "| Tong:", len(all_rows))
         time.sleep(DELAY)
 
-    # Vao tung trang chi tiet de lay gia (neu tren listing khong co)
-    if fetch_detail_for_price and all_rows:
-        need_price = [r for r in all_rows if not r.get("price_vnd")]
+    # Vao tung trang chi tiet:
+    # - lấy giá nếu thiếu (requests)
+    # - và/hoặc lấy spec trong modal 'Thông số kĩ thuật' (Selenium) để fill connection/battery/brand...
+    if all_rows:
+        need_price = [r for r in all_rows if (fetch_detail_for_price and not r.get("price_vnd"))]
+        need_specs = [
+            r
+            for r in all_rows
+            if (not r.get("connection")) or (not r.get("brand")) or (not r.get("battery_life_hours")) or (not r.get("weight_gram"))
+        ]
+
         if need_price:
-            print("Vao", len(need_price), "trang chi tiet de lay gia...")
-        for i, row in enumerate(all_rows):
-            if row.get("price_vnd"):
-                continue
-            try:
-                html = fetch_html(row["url"])
-                row = parse_detail_page(html, row)
-                all_rows[i] = row
-                if (i + 1) % 5 == 0:
-                    print("  ", i + 1, "/", len(all_rows))
-            except Exception:
-                # bo qua neu co loi tren 1 trang chi tiet
-                pass
-            time.sleep(DELAY_DETAIL)
+            print("Vao", len(need_price), "trang chi tiet de lay gia (requests)...")
+        if DETAIL_SELENIUM and SELENIUM_AVAILABLE and need_specs:
+            print("Vao", len(need_specs), "trang chi tiet de mo modal thong so (selenium) lay connection/battery/...)")
+
+        driver = None
+        try:
+            if DETAIL_SELENIUM and SELENIUM_AVAILABLE and need_specs:
+                driver = _open_detail_driver()
+            for i, row in enumerate(all_rows):
+                try:
+                    # 1) Gia (requests)
+                    if fetch_detail_for_price and not row.get("price_vnd"):
+                        html = fetch_html(row["url"])
+                        row = parse_detail_page(html, row)
+
+                    # 2) Spec trong modal (selenium)
+                    if driver and ((not row.get("connection")) or (not row.get("battery_life_hours")) or (not row.get("brand")) or (not row.get("weight_gram"))):
+                        specs = fetch_cellphones_specs_via_modal(row["url"], driver=driver)
+                        for k, v in specs.items():
+                            if v not in (None, "", 0):
+                                row[k] = v
+
+                    all_rows[i] = row
+                    if (i + 1) % 10 == 0:
+                        print("  ", i + 1, "/", len(all_rows))
+                except Exception:
+                    pass
+                time.sleep(DELAY_DETAIL)
+        finally:
+            if driver:
+                try:
+                    driver.quit()
+                except Exception:
+                    pass
 
     return all_rows
 

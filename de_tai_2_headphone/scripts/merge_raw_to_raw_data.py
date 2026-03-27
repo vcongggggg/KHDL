@@ -15,6 +15,7 @@ SOURCES = [
     "headphone_cellphones",
     "headphone_gearvn",
     "headphone_phongvu",
+    "headphone_hoanghamobile",
 ]
 
 

@@ -1,0 +1,64 @@
+source,url,name,price_raw,price_vnd,brand,type,is_gaming,is_wireless,has_mic,connection,battery_life_hours,weight_gram
+gearvn,https://gearvn.com/products/tai-nghe-razer-barracuda-x-2022,Tai nghe Razer Barracuda X 2022,2.750.000₫,2750000,Razer,over-ear,1,0,1,Type-C 3.5mm,30,250
+gearvn,https://gearvn.com/products/tai-nghe-hp-hyperx-cloud-earbuds-ii-red,Tai nghe HP HYPERX Cloud Earbuds II Red,849.000₫,849000,HYPERX,in-ear,1,0,1,3.5mm,,
+gearvn,https://gearvn.com/products/tai-nghe-onikuma-in-ear-t20-tws-bluetooth-trang,Tai nghe Onikuma In-ear T20 TWS Bluetooth Trắng,640.000₫,640000,Onikuma,in-ear,1,1,1,Type-C,6,
+gearvn,https://gearvn.com/products/tai-nghe-razer-barracuda-x-2022-quart,Tai nghe Razer Barracuda X 2022 Quart,2.590.000₫,2590000,Razer,over-ear,1,0,1,Type-C,50,250
+gearvn,https://gearvn.com/products/tai-nghe-gaming-rapoo-vh160,Tai nghe Gaming Rapoo VH160,690.000₫,690000,Rapoo,over-ear,1,0,0,Có dây,,340
+gearvn,https://gearvn.com/products/tai-nghe-hyperx-cloud-stinger-core-ii,Tai nghe HyperX Cloud Stinger Core II,790.000₫,790000,HyperX,over-ear,1,0,1,3.5mm,,244
+gearvn,https://gearvn.com/products/tai-nghe-logitech-g733-lightspeed-wireless-white,Tai nghe Logitech G733 LIGHTSPEED Wireless White,2.370.000₫,2370000,LOGITECH,over-ear,1,1,1,USB,29,278
+gearvn,https://gearvn.com/products/tai-nghe-logitech-g-pro-x-2-lightspeed-white,Tai nghe Logitech G PRO X 2 LIGHTSPEED White,4.870.000₫,4870000,Logitech,over-ear,1,0,1,USB-A,50,345
+gearvn,https://gearvn.com/products/tai-nghe-logitech-g733-lightspeed-wireless-black,Tai nghe Logitech G733 LIGHTSPEED Wireless Black,2.370.000₫,2370000,LOGITECH,over-ear,1,1,1,USB-A,29,278
+gearvn,https://gearvn.com/products/tai-nghe-e-dra-eh494w-black,Tai nghe E-Dra EH494W Black,950.000₫,950000,Dra,over-ear,1,1,1,Không dây 2.4Ghz Bluetooth 3.5mm,1000,
+gearvn,https://gearvn.com/products/tai-nghe-onikuma-in-ear-t18-enc-bluetooth-den,Tai nghe Onikuma In-ear T18 ENC Bluetooth Đen,590.000₫,590000,Trung Quốc,in-ear,1,1,1,Bluetooth,350,3.9
+gearvn,https://gearvn.com/products/tai-nghe-razer-hammerhead-v3-wired-earbuds,Tai nghe Razer Hammerhead V3 Wired Earbuds,1.190.000₫,1190000,RAZER,in-ear,1,0,1,3.5mm,,25
+gearvn,https://gearvn.com/products/tai-nghe-logitech-g-pro-x-2-lightspeed-black,Tai nghe Logitech G PRO X 2 LIGHTSPEED Black,4.870.000₫,4870000,Logitech,over-ear,1,0,1,Type-C,50,345
+gearvn,https://gearvn.com/products/tai-nghe-logitech-g-pro-x-2-lightspeed-pink,Tai nghe Logitech G PRO X 2 LIGHTSPEED Pink,4.870.000₫,4870000,Logitech,over-ear,1,0,1,Type-C,50,345
+gearvn,https://gearvn.com/products/tai-nghe-corsair-hs35-v2-carbon,Tai nghe Corsair HS35 V2 Carbon,890.000₫,890000,Mỹ,over-ear,1,0,1,3.5mm,,250
+gearvn,https://gearvn.com/products/tai-nghe-hp-hyperx-cloud-iii-black,Tai nghe HP HyperX Cloud III Black,2.190.000₫,2190000,HP HyperX,over-ear,1,0,1,USB-A 3.5mm,120,320
+gearvn,https://gearvn.com/products/tai-nghe-logitech-g522-lightspeed-wireless-white,Tai nghe Logitech G522 Lightspeed Wireless White,3.390.000₫,3390000,Logitech,over-ear,1,1,1,Type-C,90,290
+gearvn,https://gearvn.com/products/tai-nghe-razer-kraken-kitty-v2-bt-white,Tai nghe Razer Kraken Kitty V2 BT White,2.690.000₫,2690000,Razer,over-ear,1,1,1,Bluetooth,20,280
+gearvn,https://gearvn.com/products/tai-nghe-razer-kraken-kitty-v2-bt-quartz,Tai nghe Razer Kraken Kitty V2 BT Quartz,2.690.000₫,2690000,Razer,,1,0,0,USB-A,60,325
+gearvn,https://gearvn.com/products/tai-nghe-logitech-g435-lightspeed-wireless-black,Tai nghe Logitech G435 Lightspeed Wireless - Black,1.390.000₫,1390000,Logitech,over-ear,1,1,1,USB-A,18,165
+gearvn,https://gearvn.com/products/tai-nghe-hp-hyperx-cloud-earbuds-ii-black,Tai nghe HP HYPERX Cloud Earbuds II Black,849.000₫,849000,HP,in-ear,1,0,1,3.5mm,,
+gearvn,https://gearvn.com/products/tai-nghe-razer-kraken-kitty-v3-x-white,Tai nghe Razer Kraken Kitty V3 X White,1.790.000₫,1790000,RAZER,over-ear,1,0,1,3.5mm,,270
+gearvn,https://gearvn.com/products/tai-nghe-razer-kraken-kitty-v3-x-quartz,Tai nghe Razer Kraken Kitty V3 X Quartz,1.790.000₫,1790000,Razer,over-ear,1,0,1,3.5mm,,270
+gearvn,https://gearvn.com/products/tai-nghe-logitech-g733-lightspeed-wireless-lilac,Tai nghe Logitech G733 LIGHTSPEED Wireless Lilac,2.390.000₫,2390000,Logitech,over-ear,1,1,1,USB,29,278
+gearvn,https://gearvn.com/products/tai-nghe-razer-hammerhead-v3-wired-earbuds-white,Tai nghe Razer Hammerhead V3 Wired Earbuds White,1.190.000₫,1190000,Razer,in-ear,1,0,1,USB Type-C,,
+gearvn,https://gearvn.com/products/tai-nghe-logitech-g522-lightspeed-wireless-black,Tai nghe Logitech G522 Lightspeed Wireless Black,3.390.000₫,3390000,Logitech,over-ear,1,1,1,Type-C,90,290
+gearvn,https://gearvn.com/products/tai-nghe-razer-kraken-bt-kitty-edition-quartz,Tai nghe Razer Kraken BT Kitty Edition - Quartz,1.990.000₫,1990000,Razer,over-ear,1,1,1,Bluetooth,20,295
+gearvn,https://gearvn.com/products/tai-nghe-hp-hyperx-cloud-iii-red,Tai nghe HP HyperX Cloud III Red,2.190.000₫,2190000,HP HyperX,over-ear,1,0,1,USB-A,,304
+gearvn,https://gearvn.com/products/tai-nghe-true-wireless-rapoo-i100,Tai nghe True Wireless Rapoo i100,690.000₫,690000,Rapoo,,0,1,1,,,
+gearvn,https://gearvn.com/products/tai-nghe-dareu-eh416-rgb,Tai nghe DareU EH416 RGB,370.000₫,370000,DareU,over-ear,1,0,1,USB,,300
+gearvn,https://gearvn.com/products/tai-nghe-onikuma-in-ear-t20-tws-bluetooth-den,Tai nghe Onikuma In-ear T20 TWS Bluetooth Đen,640.000₫,640000,Onikuma,in-ear,1,1,1,,5,45
+gearvn,https://gearvn.com/products/tai-nghe-onikuma-in-ear-t18-enc-bluetooth-trang,Tai nghe Onikuma In-ear T18 ENC Bluetooth Trắng,590.000₫,590000,Onikuma,in-ear,1,1,1,Bluetooth,,
+gearvn,https://gearvn.com/products/tai-nghe-asus-rog-cetra-true-wireless,Tai nghe Asus ROG Cetra True Wireless,1.750.000₫,1750000,ASUS,in-ear,1,1,1,Type-C,21,47
+gearvn,https://gearvn.com/products/razer-hammerhead-pro-v2,Tai nghe Razer Hammerhead Pro V2 (RZ04-01730100-R3A1),750.000₫,750000,Razer,in-ear,1,0,1,3.5mm,,
+gearvn,https://gearvn.com/products/tai-nghe-corsair-hs55-carbon,Tai nghe Corsair HS55 Carbon (CA-9011260-AP),990.000₫,990000,Corsair,over-ear,1,0,1,3.5mm,24,273
+gearvn,https://gearvn.com/products/tai-nghe-bluetooth-soundpeats-air-3-pro,Tai nghe Bluetooth SoundPeats Air 3 Pro,1.590.000₫,1590000,Bluetooth,,1,1,1,,7,
+gearvn,https://gearvn.com/products/tai-nghe-asus-rog-cetra-true-wireless-white,Tai nghe Asus ROG Cetra True Wireless White,1.650.000₫,1650000,Asus,,1,1,1,,27,
+gearvn,https://gearvn.com/products/tai-nghe-steelseries-arctis-nova-7-dragon-edition,Tai nghe Steelseries Arctis Nova 7 Dragon Edition,3.990.000₫,3990000,Steelseries,over-ear,1,0,1,Type-C,38,359
+gearvn,https://gearvn.com/products/tai-nghe-dareu-eh469-7-1-rgb,Tai nghe DAREU EH469 7.1 RGB Black,400.000₫,400000,DAREU,over-ear,1,0,1,USB,,280
+gearvn,https://gearvn.com/products/tai-nghe-corsair-hs35-surround-v2-carbon,Tai nghe Corsair HS35 Surround v2 Carbon,1.290.000₫,1290000,Corsair,over-ear,1,0,1,3.5mm,,250
+gearvn,https://gearvn.com/products/tai-nghe-logitech-g435-lightspeed-wireless-white,Tai nghe Logitech G435 Lightspeed Wireless - White,1.390.000₫,1390000,Logitech,over-ear,1,1,1,Type-C,18,165
+gearvn,https://gearvn.com/products/tai-nghe-razer-kraken-v3-x-usb,Tai nghe Razer Kraken V3 X USB,1.250.000₫,1250000,Razer,over-ear,1,0,1,USB,,285
+gearvn,https://gearvn.com/products/tai-nghe-asus-rog-cetra-ii-core,Tai nghe Asus ROG Cetra II Core,990.000₫,990000,Asus,in-ear,1,0,1,3.5mm,,28
+gearvn,https://gearvn.com/products/tai-nghe-khong-day-razer-blackshark-v3-pro-counter-strike-2-edition,Tai nghe không dây Razer Blackshark V3 Pro Counter-Strike 2 Edition,8.290.000₫,8290000,Razer,over-ear,1,0,1,USB-A,40,387
+gearvn,https://gearvn.com/products/tai-nghe-khong-day-logitech-g325-lightspeed-white,Tai nghe không dây Logitech G325 LIGHTSPEED White,2.400.000₫,2400000,Logitech,,1,0,1,Type-C,50,212
+gearvn,https://gearvn.com/products/tai-nghe-logitech-g435-lightspeed-wireless-blue-raspberry,Tai nghe Logitech G435 Lightspeed Wireless - Blue Raspberry,1.450.000₫,1450000,Logitech,over-ear,1,1,1,USB,18,165
+gearvn,https://gearvn.com/products/tai-nghe-msi-h991,Tai nghe MSI H991,1.400.000₫,1400000,MSI,over-ear,1,0,1,USB,,
+gearvn,https://gearvn.com/products/tai-nghe-razer-blackshark-v2-x,Tai nghe Razer BlackShark V2 X,1.090.000₫,1090000,Razer,over-ear,1,0,1,3.5mm,,240
+gearvn,https://gearvn.com/products/tai-nghe-e-dra-eh607b-kaki,Tai nghe E-Dra EH607B Kaki,350.000₫,350000,E-Dra,over-ear,1,0,1,USB,,300
+gearvn,https://gearvn.com/products/tai-nghe-logitech-g-pro-x,Tai nghe Logitech G Pro X Gaming Black,2.420.000₫,2420000,Logitech,over-ear,1,0,1,3.5mm,,320
+gearvn,https://gearvn.com/products/tai-nghe-khong-day-logitech-g325-lightspeed-black,Tai nghe không dây Logitech G325 LIGHTSPEED Black,2.400.000₫,2400000,Logitech,,1,0,1,Type-C,50,212
+gearvn,https://gearvn.com/products/tai-nghe-logitech-g333,Tai nghe Logitech G333 Black,930.000₫,930000,Logitech,in-ear,1,0,1,3.5mm,,
+gearvn,https://gearvn.com/products/tai-nghe-razer-blackshark-v3-pro-white,Tai nghe Razer BlackShark V3 Pro White,7.890.000₫,7890000,Razer,over-ear,1,0,1,3.5mm Type-C,40,300
+gearvn,https://gearvn.com/products/tai-nghe-razer-blackshark-v3,Tai nghe Razer BlackShark V3,4.790.000₫,4790000,Razer,over-ear,1,0,1,Type-C,,262
+gearvn,https://gearvn.com/products/tai-edra-eh414w-blk,Tai nghe E-Dra EH414W Black,990.000₫,990000,E-Dra,over-ear,1,0,1,USB,1000,270
+gearvn,https://gearvn.com/products/tai-edra-eh414w-whi,Tai nghe E-Dra EH414W White,990.000₫,990000,E-Dra,over-ear,1,0,1,USB,20,270
+gearvn,https://gearvn.com/products/tai-nghe-onikuma-in-ear-t302-tws-rgb-bluetooth-hong,Tai nghe Onikuma In-ear T302 TWS RGB Bluetooth Hồng,640.000₫,640000,Onikuma,in-ear,1,1,1,,7,
+gearvn,https://gearvn.com/products/tai-nghe-onikuma-in-ear-t302-tws-rgb-bluetooth-xam,Tai nghe Onikuma In-ear T302 TWS RGB Bluetooth Xám Trắng,640.000₫,640000,Onikuma,in-ear,1,1,1,Type-C,5,
+gearvn,https://gearvn.com/products/tai-nghe-gaming-rapoo-vh160s-black,Tai nghe Gaming Rapoo VH160S Black,390.000₫,390000,Rapoo,over-ear,1,0,1,USB,,300
+gearvn,https://gearvn.com/products/tai-nghe-onikuma-in-ear-t209-bluetooth-live-translation-den,Tai nghe Onikuma In-ear T209 Bluetooth Live Translation Đen,590.000₫,590000,Onikuma,in-ear,1,1,1,Bluetooth,,
+gearvn,https://gearvn.com/products/tai-nghe-onikuma-in-ear-t301-tws-bluetooth-trang,Tai nghe Onikuma In-ear T301 TWS Bluetooth Trắng,540.000₫,540000,Trung Quốc,in-ear,1,1,1,Bluetooth,180,3.9
+gearvn,https://gearvn.com/products/tai-nghe-true-wireless-gaming-epos-gtw-270-hybrid-with-dongle,Tai nghe True Wireless Gaming EPOS GTW 270 Hybrid with Dongle Grey,4.790.000₫,4790000,EPOS,in-ear,1,1,1,Type-C,20,5.2
+gearvn,https://gearvn.com/products/tai-nghe-apple-airpods-2-vn-a,Tai nghe Apple AirPods 2 VN/A,3.390.000₫,3390000,Apple,,0,0,0,,,40

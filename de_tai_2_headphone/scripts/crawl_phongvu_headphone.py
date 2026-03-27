@@ -6,6 +6,7 @@ from typing import List, Dict
 
 import requests
 from bs4 import BeautifulSoup
+from bs4.element import Tag
 from urllib.parse import urljoin
 
 # Selenium (de nhan nut 'Xem thêm sản phẩm' tren trang danh muc)
@@ -28,6 +29,16 @@ BASE_URL = "https://phongvu.vn"
 LISTING_URLS = [
     # Trang tong hop tai nghe
     "https://phongvu.vn/c/tai-nghe",
+    "https://phongvu.vn/c/tai-nghe-gaming",
+    "https://phongvu.vn/c/tai-nghe-wireless",
+    "https://phongvu.vn/c/tai-nghe-có-mic",
+    "https://phongvu.vn/c/tai-nghe-không-dây",
+    "https://phongvu.vn/c/tai-nghe-trùm-đầu",
+    "https://phongvu.vn/c/tai-nghe-nhét-tai",
+    "https://phongvu.vn/c/tai-nghe-nhet-tai",
+    "https://phongvu.vn/c/tai-nghe-chụp-tai",
+    "https://phongvu.vn/c/tai-nghe-chup-tai",
+    "https://phongvu.vn/c/tai-nghe-trum-dau",
 ]
 
 MAX_PAGES_PER_LISTING = int(os.environ.get("PHONGVU_MAX_PAGES", "10"))  # khong dung nua (Selenium), giu de tuong thich
@@ -44,11 +55,116 @@ DELAY = 1.0
 DELAY_DETAIL = 0.8
 
 
+def _is_headphone_candidate(name: str, url: str) -> bool:
+    n = (name or "").lower()
+    u = (url or "").lower()
+    # URL thường chứa slug "tai-nghe" nếu đúng ngành hàng
+    if "tai-nghe" in u:
+        return True
+    # Keyword positive
+    positive = [
+        "tai nghe",
+        "headphone",
+        "earbud",
+        "earbuds",
+        "tws",
+        "true wireless",
+        "in-ear",
+        "over-ear",
+        "chụp tai",
+        "chup tai",
+        "nhét tai",
+        "nhet tai",
+        "airpods",
+    ]
+    if any(k in n for k in positive):
+        return True
+    return False
+
+
 def fetch_html(url: str) -> str:
     r = requests.get(url, headers=HEADERS, timeout=15)
     r.raise_for_status()
     r.encoding = r.apparent_encoding or "utf-8"
     return r.text
+
+
+def _sanitize_url(raw: str) -> str:
+    s = (raw or "").strip()
+    if not s:
+        return s
+    first_http = s.find("http")
+    if first_http > 0:
+        s = s[first_http:]
+    if s.startswith("http") and s.count("http") >= 2:
+        s = s[: s.find("http", 4)]
+    s = s.replace(" ", "")
+    return s
+
+
+def _scroll_and_try_expand(driver) -> None:
+    # Scroll để trigger lazy render
+    try:
+        driver.execute_script("window.scrollTo(0, document.body.scrollHeight * 0.35);")
+        time.sleep(0.6)
+        driver.execute_script("window.scrollTo(0, document.body.scrollHeight * 0.7);")
+        time.sleep(0.6)
+        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        time.sleep(0.9)
+    except Exception:
+        return
+
+    # Best-effort: click các nút mở rộng nếu có
+    for xp in [
+        "//button[contains(., 'Xem thêm')]",
+        "//button[contains(., 'Xem chi tiết')]",
+        "//div[contains(@class,'button-text') and contains(., 'Xem thêm')]",
+    ]:
+        try:
+            btn = driver.find_element(By.XPATH, xp)
+            driver.execute_script("arguments[0].scrollIntoView({block:'center'});", btn)
+            time.sleep(0.2)
+            driver.execute_script("arguments[0].click();", btn)
+            time.sleep(0.6)
+        except Exception:
+            pass
+
+
+def _open_detail_driver():
+    if not SELENIUM_AVAILABLE:
+        return None
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")
+    chrome_options.add_argument("--no-sandbox")
+    chrome_options.add_argument("--disable-dev-shm-usage")
+    chrome_options.add_argument("--window-size=1920,1080")
+    service = Service(ChromeDriverManager().install())
+    return webdriver.Chrome(service=service, options=chrome_options)
+
+
+def _fetch_detail_html(url: str, driver=None) -> str:
+    """
+    PhongVu detail thường render JS -> dùng Selenium để lấy page_source đã render.
+    Nếu Selenium không có thì fallback requests.
+    """
+    url = _sanitize_url(url)
+    if not url:
+        return ""
+
+    if not SELENIUM_AVAILABLE or driver is None:
+        return fetch_html(url)
+
+    try:
+        driver.get(url)
+        WebDriverWait(driver, 20).until(lambda d: d.execute_script("return document.readyState") == "complete")
+        _scroll_and_try_expand(driver)
+        return driver.page_source
+    except Exception:
+        # fallback requests nếu Selenium lỗi
+        try:
+            return fetch_html(url)
+        except Exception:
+            return ""
 
 
 def clean_price_text(price_text: str) -> int:
@@ -190,6 +306,8 @@ def parse_listing(html: str, page_url: str) -> List[Dict]:
 
         name_el = card.select_one("h3.css-1xdyrhj, h3, h4, .css-1ehqh5q")
         name = (name_el.get_text() if name_el else a.get_text() or "").strip()
+        if not _is_headphone_candidate(name, full_url):
+            continue
 
         price_raw = ""
         # Gia hien tai: .att-product-detail-latest-price
@@ -221,52 +339,111 @@ def parse_listing(html: str, page_url: str) -> List[Dict]:
     return rows
 
 
-def _extract_specs_from_text(text: str) -> Dict:
-    lines = [ln.strip() for ln in text.splitlines() if ln.strip()]
+def _extract_specs_from_html(container: Tag) -> Dict:
+    """
+    Trích các thông số chính từ block HTML 'Thông số kĩ thuật' của Phong Vũ.
+    Dựa trên cấu trúc:
+      div.css-19vrbri > div.css-1lchwqw (label) + div.css-1lchwqw (value)
+    """
     specs: Dict = {
         "brand": "",
         "connection": "",
-        "battery_life_hours": "",
-        "weight_gram": "",
+        "battery_life_hours": None,
+        "weight_gram": None,
+        "type": "",
+        "is_wireless": 0,
+        "has_mic": 0,
     }
 
-    def get_after_any(labels):
-        for i, ln in enumerate(lines):
-            for label in labels:
-                if label.lower() in ln.lower():
-                    for j in range(i + 1, min(i + 6, len(lines))):
-                        if lines[j]:
-                            return lines[j]
-        return ""
+    for row in container.select("div.css-19vrbri"):
+        cells = row.select("div.css-1lchwqw")
+        if len(cells) < 2:
+            continue
+        label = cells[0].get_text(strip=True)
+        value = cells[1].get_text(strip=True)
+        if not label:
+            continue
 
-    brand = get_after_any(["Thương hiệu", "Hãng sản xuất"])
-    if not brand:
-        m = re.search(
-            r"(Sony|JBL|Sennheiser|Bose|Hyperx|HyperX|Anker|Baseus|Havit|Samsung|Xiaomi|Razer|Logitech|Steelseries)",
-            text,
-            flags=re.I,
-        )
-        if m:
-            brand = m.group(1)
-    specs["brand"] = brand.strip()
+        # Thương hiệu
+        if label.startswith("Thương hiệu"):
+            specs["brand"] = value
 
-    conn_txt = get_after_any(["Kết nối", "Chuẩn kết nối", "Cổng kết nối"])
-    if conn_txt:
-        specs["connection"] = conn_txt
+        # Kiểu tai nghe
+        elif label.startswith("Kiểu") or label.startswith("Kiểu tai nghe") or label.startswith("Kiểu"):
+            t = value.lower()
+            if any(x in t for x in ["in-ear", "nhét tai", "nhet tai"]):
+                specs["type"] = "in-ear"
+            elif any(x in t for x in ["over-ear", "chụp tai", "chup tai", "trùm đầu", "trum dau"]):
+                specs["type"] = "over-ear"
 
-    batt_txt = get_after_any(["Thời lượng pin", "Thời gian sử dụng", "Thời gian chơi nhạc"])
-    if batt_txt:
-        nums = re.findall(r"\d+", batt_txt)
-        if nums:
-            specs["battery_life_hours"] = max(nums, key=int)
+        # Kết nối (Bluetooth, 3.5mm,...)
+        elif label.startswith("Kết nối") or label.startswith("Kết nối") or label.startswith("Cổng kết nối"):
+            specs["connection"] = value
+            vlow = value.lower()
+            if "bluetooth" in vlow or "không dây" in vlow or "wireless" in vlow:
+                specs["is_wireless"] = 1
 
-    weight_txt = get_after_any(["Trọng lượng"])
-    if weight_txt:
-        m = re.search(r"([\d.,]+)\s*g", weight_txt.replace(",", "."), flags=re.I)
-        if m:
-            specs["weight_gram"] = m.group(1)
+        # Kiểu kết nối (tai nghe không dây / có dây)
+        elif label.startswith("Kiểu kết nối"):
+            vlow = value.lower()
+            if "không dây" in vlow or "wireless" in vlow or "bluetooth" in vlow:
+                specs["is_wireless"] = 1
+
+        # Micro
+        elif label.startswith("Micro") or label.startswith("Microphone"):
+            vlow = value.lower()
+            if "có" in vlow or "có" in vlow:
+                specs["has_mic"] = 1
+
+        # Thời lượng pin
+        elif label.startswith("Thời lượng pin") or label.startswith("Thời gian sử dụng") or label.startswith("Thời gian nghe nhạc"):
+            nums = re.findall(r"\d+", value)
+            if nums:
+                try:
+                    specs["battery_life_hours"] = max(map(int, nums))
+                except ValueError:
+                    pass
+
+        # Trọng lượng / Khối lượng
+        elif label.startswith("Khối lượng") or label.startswith("Khối lượng") or label.startswith("Trọng lượng"):
+            m = re.search(r"([\d.,]+)\s*g", value.replace(",", "."), flags=re.I)
+            if m:
+                try:
+                    specs["weight_gram"] = float(m.group(1))
+                except ValueError:
+                    pass
+
+        # Một số case Phong Vũ nhét cả câu mô tả dài trong value (không có label riêng cho pin),
+        # ví dụ: "Tai nghe đa năng kết nối ... Thời lượng sử dụng pin 3 - 4 giờ; ..."
+        # Khi đó ta vẫn cố gắng bắt thời lượng pin từ chính value.
+        if specs.get("battery_life_hours") is None:
+            vlow_all = value.lower()
+            if any(k in vlow_all for k in ["thời lượng", "thoi luong", "thời gian sử dụng", "thoi gian su dung", "thời lượng pin", "thoi luong pin", "pin "]):
+                nums = re.findall(r"\d+", value)
+                if nums:
+                    try:
+                        specs["battery_life_hours"] = max(map(int, nums))
+                    except ValueError:
+                        pass
 
     return specs
+
+
+def _find_detail_container(soup: BeautifulSoup) -> Tag:
+    # Ưu tiên "Thông tin chi tiết" (đúng với debug)
+    title = soup.find(["div", "h5"], string=re.compile("Thông tin chi tiết", re.I))
+    if not title:
+        # fallback: có thể có "Thông số kỹ thuật"
+        title = soup.find(["div", "h5"], string=re.compile("Thông số k[ií] thuật|Thông số", re.I))
+    if not title:
+        return soup  # type: ignore
+
+    parent = title.find_parent("div")
+    if not parent:
+        return title.parent or soup  # type: ignore
+
+    # Bám theo debug: thử 1 wrapper đặc trưng, không có thì dùng luôn parent
+    return parent.find_parent("div", class_=re.compile("css-1vyqkg")) or parent
 
 
 def crawl_all() -> List[Dict]:
@@ -299,21 +476,39 @@ def crawl_all() -> List[Dict]:
     # Vao trang chi tiet de lay thong so
     if all_rows:
         print("\nVao trang chi tiet PhongVu de lay thong so...")
-        for i, row in enumerate(all_rows):
-            try:
-                html = fetch_html(row["url"])
-                soup = BeautifulSoup(html, "lxml")
-                text = soup.get_text("\n", strip=True)
-                specs = _extract_specs_from_text(text)
-                for k, v in specs.items():
-                    if v:
-                        row[k] = v
-                all_rows[i] = row
-                if (i + 1) % 10 == 0:
-                    print("  ", i + 1, "/", len(all_rows))
-            except Exception:
-                pass
-            time.sleep(DELAY_DETAIL)
+        driver = None
+        try:
+            driver = _open_detail_driver()
+            for i, row in enumerate(all_rows):
+                try:
+                    html = _fetch_detail_html(row.get("url", ""), driver=driver)
+                    if not html:
+                        continue
+                    soup = BeautifulSoup(html, "lxml")
+                    container = _find_detail_container(soup)
+                    specs = _extract_specs_from_html(container)
+                    # Nếu container bắt nhầm (không thấy row spec) thì fallback quét toàn trang
+                    if (
+                        not any(v not in (None, "", 0) for v in specs.values())
+                        and len(container.select("div.css-19vrbri")) == 0
+                        and len(soup.select("div.css-19vrbri")) > 0
+                    ):
+                        specs = _extract_specs_from_html(soup)  # type: ignore
+                    for k, v in specs.items():
+                        if v not in (None, "", 0):
+                            row[k] = v
+                    all_rows[i] = row
+                    if (i + 1) % 10 == 0:
+                        print("  ", i + 1, "/", len(all_rows))
+                except Exception:
+                    pass
+                time.sleep(DELAY_DETAIL)
+        finally:
+            if driver:
+                try:
+                    driver.quit()
+                except Exception:
+                    pass
 
     return all_rows
 
