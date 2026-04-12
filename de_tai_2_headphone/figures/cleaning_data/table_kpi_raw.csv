@@ -1,0 +1,9 @@
+﻿metric,value
+n_rows,1190
+n_columns,13
+n_sources,4
+duplicate_url_count,0
+invalid_price_count(price_vnd<=0_or_nan),18
+empty_name_count,0
+empty_brand_count,0
+empty_type_count,0

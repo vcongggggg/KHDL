@@ -1,0 +1,11 @@
+# Bỏ qua folder này - không đẩy lên Git
+de_tai_1_laptop/
+
+# Python
+__pycache__/
+.venv/
+venv/
+*.pyc
+
+# Jupyter
+.ipynb_checkpoints/
