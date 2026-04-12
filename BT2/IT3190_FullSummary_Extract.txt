@@ -1,0 +1,345 @@
+==== Ch 1 (Page 5) ====
+Học máy và khai phá dữ liệu - Tài liệu đọc
+CHƯƠNG 1. GIỚI THIỆU CHUNG VỀ HỌC MÁY V À KHAI PHÁ
+DỮ LIỆU
+1.1 Các khái niệm và bài toán học cơ bản
+Đầu tiên, chúng ta hãy cùng làm quen một số khái niệm và bài toán cơ bản nhất.
+1.1.1 Vài quan điểm về ML
+Học (learning) là một khả năng căn bản của các hệ thống có trí thông minh thực sự.
+Do đó việc tạo khả năng học cho máy móc đã được đề ra và nghiên cứu khá lâu trước
+đây trong lĩnh vực AI. Tuy nhiên, chúng ta cần hiểu rõ học nghĩa là gì. Dưới đây là một
+quan điểm về việc học.
+"Learning denotes changes in the system that are adaptive in the sense that they
+enable the system to do the same task or tasks drawn from the same population
+more efficiently and more effectively the next time." [Simon, 1983]
+Quan điểm này cho ta một cái nhìn khá tổng quan về việc học, ở con người và các
+hệ thống máy móc. Khả năng học sẽ giúp các hệ thống ấy có khả năng thích nghi, tức
+là chúng có thể tự cải thiện hiệu năng khi giải quyết một nhiệm vụ (task) hoặc một lớp
+nhiệm vụ nào đó.
+Quan điểm trên cũng có thể áp dụng cho máy để giúp ta hiểu về Học máy (Machine
+Learning - ML). Mặc dù vậy, cho đến nay có khá nhiều quan điểm (cách nhìn) khác
+nhau về ML. Dưới đây là một vài ví dụ:
+"Build systems that automatically improve their performance" [Simon, 1983]
+"Program computers to optimize a performance criterion using example data
+or past experience" [Alpaydin, 2020]
+Dù được phát biểu ở nhiều góc nhìn khác nhau, nhưng chúng ta đều thấy một điểm
+chung là "hiệu năng" (performance). Nếu đứng ở góc độ ứng dụng thì chúng ta có thể
+xem: ML là một lĩnh vực cung cấp một con đường để giải quyết một nhiệm vụ thực tế,
+thông qua khả năng tự cải thiện, dựa vào dữ liệu hoặc kinh nghiệm đã có.
+Cụ thể hơn, theo Mitchell [1997], một hệ thốngcó khả năng họcnếu nó có khả năng
+tự cải thiện bản thân nó theo tiêu chíPPP khi giải quyết một nhiệm vụTTT , dựa vào dữ liệu
+5
+Học máy và khai phá dữ liệu - Tài liệu đọc
+Hình 1: Ví dụ về một email.
+hoặc kinh nghiệm EEE. Một bài toán học máy có thể được mô tả bằng bộ ba (TTT , PPP, EEE).
+Như vậy, đây là một quan điểm rất cụ thể về khả năng học của một hệ thống. Theo quan
+điểm này, chúng ta có thể đưa nhiều nhiệm vụ trong thực tế về các bài toán học máy.
+Dưới đây là vài ví dụ.
+Ví dụ 1 (Lọc thư rác - Spam filtering) Chúng ta muốn xây dựng một hệ thống có khả
+năng tự động lọc thư rác (spam) trong hòm thư điện tử (email). Hình 1 có ví dụ về một
+email.
+Có thể đưa nhu cầu này về bài toán học máy như sau:
+• TTT : Cần phán đoán một email cho trước có phải là thư rác hay không
+• PPP: Độ chính xác phán đoán (tỷ lệ emails được dự đoán đúng)
+• EEE: Tập hợp các email trong quá khứ, mỗi email đã được gán nhãn (rác/thường)
+tương ứng.
+Ví dụ 2 (Mô tả ảnh - Image captioning) Chúng ta muốn xây dựng một hệ thống có
+khả năng tự động đưa ra mô tả nội dung bên trong bức ảnh.
+Có thể đưa nhu cầu này về bài toán học máy như sau:
+• TTT : Cần đưa ra mô tả ngắn gọn về nội dung bên trong một bức ảnh cho trước
+• PPP: Độ chính xác của mô tả
+• EEE: Tập hợp các bức ảnh, mỗi bức ảnh đã được mô tả bởi một câu ngắn gọn về nội
+dung bên trong bức ảnh đó. Hình 2 chứa một tập ví dụ.1
+1Chúng được lấy từ https://openai.com/dall-e-3.
+6
+Học máy và khai phá dữ liệu - Tài liệu đọc
+lychee-inspired spherical chair
+a girl giving cat a gentle hug
+a small hedgehog holding a piece of watermelon
+Hình 2: Tập các bức ảnh và các mô tả về chúng.
+1.1.2 Bản chất của việc học, suy diễn, và phán đoán
+Con người có khả năng học rất tuyệt vời. Chúng ta có thể học từ những thứ đơn giản
+đến những thứ rất phức tạp (ví dụ như lái xe). Chúng ta có thể tự đúc rút ra kinh nghiệm
+của riêng mình khi đã quan sát nhiều lần, và về sau chúng ta có thể sử dụng kinh nghiệm
+ấy để giải quyết một công việc nào đó (ví dụ, lái xe). Như vậy, mỗi khi học, bộ não của
+chúng ta sẽ nhận nhiều tín hiệu (thông qua các quan sát bằng mắt, tai, ...) từ bên ngoài,
+rồi thực hiện xử lý hoặc tính toán nào đó, để thu được tri thức hoặc kinh nghiệm. Những
+tri thức này có thể được dùng để giải quyết một nhiệm vụ (trong tương lai).
+Như vậy, bản chất của mỗi quá trình học là tìm một hàm y∗ nào đó mà kết nối mỗi
+đầu vào xxx với đầu ra y. Nghĩa là quá trình học sẽ đi tìm một hàm (chưa biết) có dạng:
+y∗ : xxx 7→ y (1)
+trong đó:
+• xxx là một quan sát (observation) hoặc tri thức cũ. Mỗi quan sát thường ở dưới dạng
+một tập tín hiệu và thường được gọi là một mẫu dữ liệu (data instance) hoặc một ví
+dụ (example).
+• y có thể là tri thức mới hoặc kinh nghiệm mới. Đôi khi nó là một phán đoán (pre-
+diction).
+Trong thực tế, chúng ta thường không biết hàm y∗, về hình dạng hay tính chất của
+nó. Nhưng đôi khi chúng ta có thể thu thập được một số quan sát {xxx1, xxx2, ...,xxxN} về đầu
+vào xxx và một số đầu ra {y1, y2, ...,yM} tương ứng, tức là yi = y∗(xxxi) đối với vài mẫu thứ
+i. Máy sẽ cần tìm ra hàm y∗ từ một tập dữ liệu DDD = {xxx1, xxx2, ...,xxxN, y1, y2, ...,yM} đã thu
+7
+
+
+==== Ch 2 (Page 27) ====
+Học máy và khai phá dữ liệu - Tài liệu đọc
+CHƯƠNG 2. HỒI QUI V À PHÂN CỤM
+2.1 Hồi qui
+Trong phần này, chúng ta làm quen với mô hình tuyến tính (linear model) cho bài
+toán hồi qui, khái niệm hàm mất mát, lỗi thực nghiệm, và lỗi tổng quát hoá. Sau đó
+chúng ta sẽ tìm hiểu ba phương pháp huấn luyện mô hình.
+2.1.1 Mô hình hồi qui tuyến tính
+Chúng ta đã biết rằng bản chất của việc học từ dữ liệu là tìm ra được hàm y∗ kết nối
+giữa đầu vào xxx ∈ X với một đầu ra y ∈ Y nào đó. Ta thường không biết trước hình
+dạng hay đặc trưng nào cụ thể về y∗, ngoại trừ các mẫu dữ liệu (có nhãn) đã thu thập
+được.
+Đối với bài toán học có giám sát, tập dữ liệu huấn luyện thường có nhãn cho mỗi
+mẫu dữ liệu. NếuY bao gồm các số thực thì nó được gọi là bài toán hồi qui.
+Định nghĩa 4 (Hồi qui cơ bản - Regression problem)Cần tìm hàm y∗ : X → Y từ
+một tập dữ liệu DDD = {xxx1, xxx2, ...,xxxM, y1, y2, ...,yM} cho trước, trong đó y j = y∗(xxx j) với
+mỗi chỉ số j ∈ {1, 2, ...,M} và Y ⊆ R.
+Hàm y∗ lúc này thường được gọi là hàm hồi qui .
+Để tìm hiểu về mô hình tuyến tính, chúng ta xét trường hợpX là tập các vectơ trong
+không gian n chiều, tức là X ⊆ Rn. Như vậy mỗi điểm xxx ∈ X có thể được biểu diễn
+bằng vectơ cột dưới dạngxxx = (x1, ...,xn)T . Chú ý rằng:
+• Chúng ta đã dùng n thuộc tính (attribute) hoặc tín hiệu (signal) hoặc đặc trưng
+(feature) để biểu diễn một mẫu dữ liệu, và n ≥ 1. Mỗi xi là một giá trị cụ thể của
+thuộc tính thứi.
+• Nếu tập dữ liệu ban đầu ở dạng thô, chúng ta có thể thực hiện tiền xử lý (đã được
+trình bày trong Mục 1.4) để đưa chúng về dạng vectơ.
+Mặc dù bài toán hồi qui 4 đã rất cụ thể, nhưng việc giải quyết nó không dễ chút nào.
+Một lý do quan trọng là việc giải quyết bài toán ấy sẽ cần làm việc với không gian tất
+cả các hàm có dạng h : Rn → R. Không gian này quá lớn và có vô số chiều. Do đó, đây
+là một bài toán bất khả thi.
+27
+Học máy và khai phá dữ liệu - Tài liệu đọc
+Một cách làm phổ biến trong ML là chọn một dạng hàm (mô hình) cụ thể mà chúng
+ta có thể dễ dàng làm việc. Ví dụ, chúng ta chỉ xét những hàm ở dạng siêu phẳng
+(hyperplanes). Khi đó, chúng ta sẽ làm việc với một mô hình tuyến tính.
+Mô hình tuyến tính (Linear Model):xét các hàm có dạng
+f (xxx; www) = w0 + w1x1 + · · ·+ wnxn (2)
+trong đó
+• xxx = (x1, ...,xn)T ∈ Rn là một vectơ đầu vào.
+• www = (w0, w1, ...,wn)T ∈ Rn+1 là vectơ trọng số. Mỗi w j sẽ đánh trọng số cho thuộc
+tínhx j tương ứng. w0 thường được gọi là độ lệch (bias).
+• www còn được gọi là bộ tham số. Mỗi vectơ www sẽ mô tả một hàm khác nhau.
+• Chú ý rằng f là hàm tuyến tính theo biến www.
+Như vậy với việc lựa chọn kiểu mô hình tuyến tính (2), chúng ta đã thu hẹp không
+gian hàm cần xem xét. Không gian hàm đó là
+H = { f : f (xxx; www) = w0 + w1x1 + · · ·+ wnxn, xxx ∈ Rn, www ∈ Rn+1} (3)
+Việc chọn này cũng có nghĩa là chúng ta đã ngầm giả thuyết rằng hàm y∗ có thể được
+xấp xỉ tốt bởi một hàm dạng tuyến tính. Nói cách khác, ta đã giả thuyết rằng tồn tại một
+hàm f ∗ ∈ H sao cho f ∗ xấp xỉ tốty∗ tại mọi điểm.
+Sau khi đã chọn kiểu mô hình tuyến tính, việc còn lại là dùng một giải thuật học để
+tìm ra một hàm tốt nhất trong H , dựa vào một tập học DDD cho trước. Một câu hỏi đặt ra
+là Làm thế nào để biết được một hàm f tốt hơn hàm g? Một giải thuật học sẽ cần trả lời
+câu hỏi này để tìm ra một hàm tốt nhất có thể. Đối với mô hình tuyến tính (2), về bản
+chất giải thuật học sẽ cần tìm một vectơ trọng sốwww tốt nhất.
+2.1.2 Hàm mất mát (loss function)
+Để so sánh hai hàm khác nhau, chúng ta cần chọn một độ đo cụ thể. Một cách thường
+dùng trong ML là xem xét lỗi phán đoán. Giả sử y là giá trị đúng và ˆy là giá trị phán
+28
+Học máy và khai phá dữ liệu - Tài liệu đọc
+đoán. Khi đó ta có thể tính lỗi phán đoán như sau:
+c(y, ˆy) = (y − ˆy)2 (Square loss)
+Đại lượng này đôi khi còn được gọi là mất mát (loss), hoặc rủi ro (risk). Dạng hàm này
+thường được gọi là lỗi bình phương (square loss). Ngoài ra, người ta có thể dùng một
+số dạng hàm lỗi khác. Chẳng hạn:
+c(y, ˆy) = |y − ˆy| (Absolute loss, L1 loss)
+c(y, ˆy) = max{0, 1 − y ˆy} (Hinge loss)
+c(y, ˆy) = y log ˆy (Cross-entropy loss)
+Xét một mẫu dữ liệu xxx với đầu ra đúng là y. Lỗi (error) phán đoán của hàm f ∈ H
+cho mẫu này có thể đo như sau (sử dụng dạng lỗi bình phương):
+ℓ( f , xxx) = [y − f (xxx; www)]2 (4)
+Định nghĩa 5Lỗi trung bình(expected loss) của f trên toàn bộ không gian dữ liệu là
+E(xxx,y)[ℓ( f , xxx)].
+Như vậy chúng ta có thể dựa vào lỗi trung bình để so sánh khả năng của hai hàm nào
+đó trong H . Mục tiêu cốt lõi của việc học là cần tìm một hàm
+f ∗ = arg min
+f ∈H
+E(xxx,y)[ℓ( f , xxx)] (5)
+Nghĩa là f ∗ có lỗi trung bình bé nhất so với tất cả các hàm khác trong H .
+Rõ ràng f ∗ là hàm tốt nhất trong H . Tuy nhiên việc tìm ra hàm này không dễ chút
+nào, bởi việc tính kỳ vọng liên quan đến toàn bộ không gian dữ liệu. Trong thực tế
+chúng ta chỉ có thể thu thập được một tập dữ liệu DDD hữu hạn. Do đó chúng ta thường
+quan tâm đến lỗi trên tập này:
+RSS( f ) =
+M
+∑
+i=1
+ℓ( f , xxxi) =
+M
+∑
+i=1
+(yi − f (xxxi; www))2 (6)
+Đại lượng RSS( f ) thường được gọi là tổng phần dư bình phương (residual sum of
+29
+
+
+==== Ch 3 (Page 58) ====
+Học máy và khai phá dữ liệu - Tài liệu đọc
+CHƯƠNG 3. PHÂN LOẠI
+3.1 Học dựa trên láng giềng
+3.1.1 Bài toán học có giám sát
+Xét lớp bài toán học trên tập dữ liệu có nhãn {(xxxi, yi) : xxxi ∈ X , yi ∈ Y , 1 ≤ i ≤ M},
+trong đó X là không gian đầu vào, và Y là không gian nhãn đầu ra. Chúng ta cần học
+hàm y∗ kết nối giữa xxx và y.
+Dựa vào đặc điểm của không gian đầu ra, chúng ta có một số nhánh con thường thấy
+của bài toán học có giám sát:
+• Y = {0, 1}: Bài toán phân loại nhị phân
+• Y = {1, 2, ...,C}: Bài toán phân loại nhiều lớp
+• Y ∈ R: Bài toán hồi quy
+Hình 33: Ví dụ về dự đoán trên dữ liệu có nhãn.
+Chúng ta sẽ bắt đầu với một trong những thuật toán cơ bản nhất của học có giám
+sát. Lấy ví dụ về một bài toán dự đoán trên dữ liệu có nhãn như hình 33, trong đó
+xxx1, xxx2, xxx3, xxx5 là các dữ liệu với 5 thành phần con được gán nhãn 0. xxx4, xxx6 là dữ liệu với 3
+thành phần con được gán nhãn 1. Như vậy xxx7 với 3 thành phần con nên được gán nhãn
+nào? Ta thấy tính chất của xxx7 gần giống với tính chất của xxx4, xxx6 nhất, vì vậy ta có thể
+58
+Học máy và khai phá dữ liệu - Tài liệu đọc
+gán nhãn cho xxx7 tương tự như xxx4, xxx6 là 1. Đây là một minh hoạ của phương pháp học
+dựa trên hàng xóm.
+3.1.2 Học dựa trên hàng xóm
+Ý tưởng cơ bản của phương pháp học dựa trên hàng xóm là các mẫu có thuộc tính
+tương tự nhau sẽ có nhãn tương tự nhau. Cụ thể, để thực hiện được phương pháp học
+này, chúng ta cần:
+• Lưu trữ tất cả các mẫu dữ liệu trong tập họcDDD.
+• Để dự đoán cho một điểm dữ liệu mớixxx, chúng ta cần tìm những điểm dữ liệu trong
+DDD có thuộc tính tương tự (hàng xóm) như xxx. Nhãn dự đoán của xxx được xác định
+bằng cách tổng hợp các nhãn của tập hàng xóm đã tìm được.
+Để tìm được tập hàng xóm, chúng ta cần hai thành phần:
+• Một độ đo để đánh giá độ tương tự:d(uuu, vvv) ∈ R+, uuu, vvv ∈ X
+• Tập hàng xóm được xác định bằng độ đo trên.
+Các tính chất của thuật toán học dựa trên hàng xóm
+Một thuật toán học dựa trên hàng xóm thường có các tính chất sau:
+• Không cần học một tham số nào (non-parametric).
+• Học bằng các lưu trữ tất cả các dữ liệu cung cấp để huấn luyện.
+• Tốn chi phí cho việc dự đoán. Mỗi lần dự đoán cần truy vấn lại các dữ liệu đã có.
+Điều này dẫn tới cần chi phí cho lưu trữ hoặc tính toán song song hiệu quả.
+• Có ít thông tin về cấu trúc bên trong của dữ liệu.
+• Hỗ trợ một cách tự nhiên với dữ liệu tăng dần theo thời gian.
+Với những đặc điểm trên, học dựa trên hàng xóm còn được gọi với một số tên khác
+như: học dựa trên bộ nhớ (memory-based learning), học chậm (lazy learning), học theo
+điểm dữ liệu (instance-based learning).
+59
+Học máy và khai phá dữ liệu - Tài liệu đọc
+3.1.3 Thuật toán k láng giềng gần nhất (kNN)
+Khi ta giới hạn số lượng hàng xóm (láng giềng) của dữ liệu mới là k, ta được thuật
+toán k láng giềng gần nhất kNN. Khi đó, thuật toán kNN nói chung được mô tả như
+sau:
+Đầu vào : Tập học DDD chứa các cặp dạng (xxxi, yi), xxxi ∈ X , yi ∈ Y ; độ đo tương đồng
+d(uuu, vvv) ∈ R+, uuu, vvv ∈ X ; số hàng xóm k > 0.
+Học: Lưu trữ toàn bộ DDD
+Dự đoán:
+• Với mỗi điểm dữ liệu mớixxx, tính tập hàng xóm NBk(xxx) là chỉ mục (index) sao cho
+d(xxxi, xxx), i ∈ NBk(xxx) thuộc top k giá trị tương đồng tốt nhất (khoảng cách nhỏ nhất).
+• Nhãn dự đoán của xxx là tổng hợp nhãn y = Aggr(yi|i ∈ NBk(xxx)), trong đó Aggr là
+một hàm kết tập tuỳ thuộc vào không gian của Y .
+kNN trong bài toán phân loại
+Khi Y là tập nhãn rời rạc, thì hàm Aggr thường được sử dụng là hàm đề xuất nhiều
+nhất (max-voting), tức là nhãn được xuất hiện nhiều nhất trongNBk(xxx) sẽ được sử dụng
+là nhãn của xxx.
+y = LabelAppearT heMost ({yi|i ∈ NBk(xxx)})
+kNN trong bài toán hồi quy
+Khi Y là miền liên tục, thì hàm Aggr thường được sử dụng là hàm trung bình cộng.
+y = 1
+|NBk(xxx)| ∑
+i∈NBk(xxx)
+yi
+3.1.4 Hai thành phần cơ bản trong kNN
+Chúng ta xem xét hai thành phần cơ bản trong thuật toán kNN : độ đo tương đồng và
+số lượng hàng xóm k.
+i) Độ đo tương đồng
+Độ đo tương đồng đóng một vai trò quan trọng trong thuật toán kNN khi nó đi kèm
+với giả thiết về phân bố của dữ liệu, và một khi đã xác định sẽ không thay đổi. Sử dụng
+60
+
+
+==== Ch 4 (Page 133) ====
+Học máy và khai phá dữ liệu - Tài liệu đọc
+CHƯƠNG 4. KHAI PHÁ DỮ LIỆU
+4.1 Khai phá dữ liệu
+4.1.1 Tại sao cần Khai phá dữ liệu?
+Tập đoàn Dữ liệu quốc tế (IDC), một đơn vị nghiên cứu thông tin thị trường, đã dự
+đoán rằng sau mỗi năm, “vũ trụ số” (digital universe) – dung lượng dữ liệu được tạo ra
+và sao chép sẽ đạt 180 zettabyte (180 ngàn tỷ tỷ byte) vào năm 2025 và dung lượng dữ
+liệu sẽ tăng gấp đôi sau mỗi 2 năm trong thập kỷ tới. Theo tờ báo Wall Street Journal,
+các tập đoàn lớn như Amazon, Alphabet và Microsoft đã đầu tư 32 tỷ USD cho các
+“nhà máy lọc dữ liệu” với dự đoán rằng, dữ liệu sẽ ngày một tăng mạnh và nhanh hơn
+trong tương lai.
+Thế hệ dữ liệu hiện nay cũng có chất lượng cao hơn do chúng nằm trong một thế
+giới kết nối. Theo nghiên cứu của PwC (PricewaterhouseCoopers), hiện có khoảng 8,4
+tỷ thiết bị di động thông minh, cảm biến, thiết bị truyền động, xe cộ, máy ghi hình và
+máy bay không người lái được kết nối với nhau trên toàn cầu. Trung bình mỗi ngày
+các doanh nghiệp có thể tạo ra hàng triệu mảnh dữ liệu không cấu trúc (unstructured).
+Các dữ liệu này có thể ở dưới dạng thư điện tử, bài viết trên mạng xã hội hay là những
+cuộc trò chuyện về khách hàng, hành vi của công chúng và những xu hướng phát triển
+mới. Lượng dữ liệu đang thực sự bùng nổ hơn bao giờ hết và dữ liệu đang ngày càng
+dễ tiếp cận. Việc ứng dụng của dữ liệu cũng đa dạng hơn rất nhiều so với những thế kỷ
+trước nhưng chỉ có 0,5% toàn bộ dữ liệu trên thế giới được xử lý và sử dụng mỗi năm,
+theo Technology Review. Có thể nói chúng ta bị tràn ngập trong dữ liệu nhưng lại thiếu
+(cần) tri thức. Khai phá dữ liệu liên quan đến việc trích xuất thông tin từ một lượng
+lớn dữ liệu. Khai phá dữ liệu là một kỹ thuật khám phá các loại mẫu khác nhau được
+ẩn chứa trong tập dữ liệu và là các tri thức mới và hữu ích. Vì vậy, ứng dụng của khai
+phá dữ liệu để thấu hiểu thị trường, khách hàng và bản thân doanh nghiệp đóng một
+vai trò rất quan trọng, đặc biệt là trong khả năng quản trị doanh nghiệp, dự báo và lên
+kế hoạch kinh doanh. Nó giúp quản lý chi phí, giảm thiểu rủi ro và là chìa khóa cho sự
+tăng trưởng của doanh nghiệp và tạo ra những điểm khác biệt và lợi thế cạnh tranh nổi
+bật cho doanh nghiệp trong tương lai.
+133
+Học máy và khai phá dữ liệu - Tài liệu đọc
+4.1.2 Dữ liệu, Thông tin, và Tri thức
+Dữ liệu, Thông tin và Tri thức là ba khái niệm cơ bản của thời đại chúng ta - thời đại
+số. Nói một cách căn bản, dữ liệu là những tín hiệu thô con người quan sát, thu thập
+hoặc đo đạc được về các sự kiện, sự vật đã và đang diễn ra; thông tin là ý nghĩa của dữ
+liệu có được nhờ xử lý dữ liệu; tri thức là những hiểu biết ở mức cao hơn, có từ tổng
+hợp kinh nghiệm và liên kết thông tin liên quan dẫn đến quyết định hành động.
+Định nghĩa của dữ liệu
+Dữ liệu là tín hiệu (signals) thu được do quan sát, đo đạc, thu thập... từ các đối tượng.
+Cụ thể, dữ liệu là giá trị (values) của các thuộc tính (features) của các đối tượng, được
+biểu diễn bằng dãy các bits, các con số hay ký hiệu...
+Một số các định nghĩa khác về dữ liệu:
+• Dữ liệu chỉ là dữ kiện thô [Long and Long, 2002].
+• Dữ liệu. . . là các luồng dữ kiện thô biểu diễn các sự kiện. . . trước khi chúng được
+sắp xếp thành một dạng mà mọi người có thể hiểu và sử dụng [Laudon and Laudon,
+1997].
+• Dữ liệu bao gồm các dữ kiện [Hayes, 1993], các ký hiệu được ghi lại [McNurlin
+and Sprague, 2005].
+Định nghĩa của Thông tin
+Thông tin là dữ liệu có ý nghĩa (data equiped with meaning), thu được khi xử lý dữ
+liệu để lọc bỏ đi các phần dư thừa, tìm ra phần cốt lõi đặc trưng cho dữ liệu.
+Một số các định nghĩa khác về thông tin:
+• Dữ liệu đã được đưa về một dạng có ý nghĩa và hữu ích đối với con người (Laudon
+and Laudon, 1998)
+• Dữ liệu đã được thu thập và xử lý thành một dạng có ý nghĩa. Đơn giản, thông tin
+là ý nghĩa mà chúng ta cung cấp cho các dữ kiện tích lũy (Long and Long, 1998)
+Định nghĩa của Tri thức
+Tri thức là thông tin tích hợp, như quan hệ giữa các sự kiện, giữa các thông tin... thu
+được qua quá trình nhận thức, phát hiện hoặc học tập.
+Một số các định nghĩa khác về tri thức:
+134
+Học máy và khai phá dữ liệu - Tài liệu đọc
+Hình 51: Minh hoạ kim tự tháp tri thức.
+• Kết quả của sự hiểu biết thông tin [Hayes, 1993].
+• Kết quả của việc ngấm thông tin [Hayes, 1993].
+• Thông tin có định hướng hoặc ý định, nó giúp hỗ trợ cho một quyết định hoặc một
+hành động [Zachman, 1987].
+Kim tự tháp tri thức
+Con người thu dữ liệu bằng nhiều cách và dữ liệu (tín hiệu thô) thường có nhiều
+dạng, như chữ số, văn bản, hình ảnh, âm thanh, đồ thị, video... Dữ liệu có thể có được
+qua khảo sát và điều tra; qua quan sát, ghi chép và thu thập. Dữ liệu cũng có thể có được
+qua đo đạc Điều cốt lõi là thông tin và tri thức-đặc biệt là các tri thức không tường minh
+(tacit knowledge) - cần cho các quyết định và hoạt động hằng ngày của con người đều
+ẩn chứa trong dữ liệu thu thập được. Trong kỷ nguyên số, khi tri thức là sức mạnh và
+trong cuộc cách mạng công nghiệp lần thứ tư, khi "thông minh hóa" là xu thế, chính dữ
+liệu là nguồn tài nguyên vô giá để giúp ta thấu hiểu về các hoạt động, để tìm ra thông
+tin, tìm ra tri thức, để mỗi hoạt động đều có thể là hoạt động thông minh.
+4.1.3 Các bài toán trong khai phá dữ liệu
+Các bài toán trong Khai phá dữ liệu được có thể chia làm 2 nhóm chính:
+• Tác vụ mô tả: có nhiệm vụ mô tả về các tính chất hoặc phân tích các đặc tính
+chung của dữ liệu để thu được thông tin mới hoặc cho một mục đích hữu ích nào
+đó. Nhóm bài toán thuộc tác vụ này gồm: phân cụm(Clustering), tổng hợp hóa
+(Summerization), khai phá luật kết hợp (Association Rules), ...
+135
+
+

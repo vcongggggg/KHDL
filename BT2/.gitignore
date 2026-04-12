@@ -1,0 +1,6 @@
+*.pdf
+.ipynb_checkpoints/
+__pycache__/
+*.pyc
+binh_chon_ket_qua.csv
+ket_qua_bt2_fast.csv
