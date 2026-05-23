@@ -13,10 +13,10 @@ for f in ['raw_data_train.csv', 'raw_data_test.csv']:
         os.remove(f)
         print(f"Da xoa: {f}")
 
-# Cau hinh so dong phu hop may 16GB RAM
-TRAIN_SIZE   = 30000
-TEST_SIZE    = 7500
-TOTAL_NEEDED = TRAIN_SIZE + TEST_SIZE  # 37.500 dong
+# Cau hinh so dong phu hop may 16GB RAM (ti le 90% Train / 10% Test theo yeu cau phan cum)
+TOTAL_NEEDED = 37500
+TEST_SIZE    = 3750
+TRAIN_SIZE   = TOTAL_NEEDED - TEST_SIZE
 RANDOM_STATE = 42
 
 print(f"Dang tai {TOTAL_NEEDED} dong tu HuggingFace...")
